@@ -1,6 +1,6 @@
 # Warehouse - Склад
-## Используемые технологии
-ASP.NET Core 8
-Razor Pages
-Entity Framework Core
-MS SQL Server
+### Используемые технологии
+1. ASP.NET Core 8
+2. Razor Pages
+3. Entity Framework Core
+4. MS SQL Server
