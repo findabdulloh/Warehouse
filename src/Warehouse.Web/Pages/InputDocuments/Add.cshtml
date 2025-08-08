@@ -1,0 +1,126 @@
+﻿@page
+@model CreateModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Создать поступление";
+}
+
+<h1>Создать поступление</h1>
+
+<form method="post">
+    <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+
+    <div class="mb-3">
+        <label class="form-label">Номер</label>
+        <input asp-for="InputDocument.Number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Дата</label>
+        <input asp-for="InputDocument.Date" type="date" class="form-control" required />
+    </div>
+
+    <h4>Ресурсы</h4>
+
+    <div id="resources-container">
+        @for (int i = 0; i < Model.InputDocument.InputResources.Count; i++)
+        {
+            <div class="resource-item border p-3 mb-2">
+                <div class="mb-2">
+                    <label asp-for="InputDocument.InputResources[i].Amount">Кол-во</label>
+                    <input asp-for="InputDocument.InputResources[i].Amount" class="form-control" required />
+                    <span asp-validation-for="InputDocument.InputResources[i].Amount" class="text-danger"></span>
+                </div>
+                <div class="mb-2">
+                    <label asp-for="InputDocument.InputResources[i].ResourceId">Ресурс</label>
+                    <select asp-for="InputDocument.InputResources[i].ResourceId" class="form-select" asp-items="Model.ResourceOptions" required>
+                        <option value="">-- Выберите ресурс --</option>
+                    </select>
+                    <span asp-validation-for="InputDocument.InputResources[i].ResourceId" class="text-danger"></span>
+                </div>
+                <div class="mb-2">
+                    <label asp-for="InputDocument.InputResources[i].MeasurementUnitId">Ед. измерения</label>
+                    <select asp-for="InputDocument.InputResources[i].MeasurementUnitId" class="form-select" asp-items="Model.MeasurementUnitOptions" required>
+                        <option value="">-- Выберите ед. измерения --</option>
+                    </select>
+                    <span asp-validation-for="InputDocument.InputResources[i].MeasurementUnitId" class="text-danger"></span>
+                </div>
+                <button type="button" class="btn btn-danger" onclick="removeResource(this)">Удалить</button>
+            </div>
+        }
+    </div>
+
+    <button type="button" class="btn btn-secondary mb-3" onclick="addResource()">Добавить ресурс</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let resourceIndex = @Model.InputDocument.InputResources.Count;
+
+        function addResource() {
+            const container = document.getElementById('resources-container');
+
+            const template = `
+                        <div class="resource-item border p-3 mb-2">
+                            <div class="mb-2">
+                                <label>Кол-во</label>
+                                <input name="InputDocument.InputResources[${resourceIndex}].Amount" class="form-control" required />
+                            </div>
+                            <div class="mb-2">
+                                <label>Ресурс</label>
+                                <select name="InputDocument.InputResources[${resourceIndex}].ResourceId" class="form-select" required>
+                                    <option value="">-- Выберите ресурс --</option>
+        @foreach (var item in Model.ResourceOptions)
+        {
+                                            <option value="@item.Value">@item.Text</option>
+        }
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label>Ед. измерения</label>
+                                <select name="InputDocument.InputResources[${resourceIndex}].MeasurementUnitId" class="form-select" required>
+                                    <option value="">-- Выберите ед. измерения --</option>
+        @foreach (var unit in Model.MeasurementUnitOptions)
+        {
+                                            <option value="@unit.Value">@unit.Text</option>
+        }
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-danger" onclick="removeResource(this)">Удалить</button>
+                        </div>`;
+
+            container.insertAdjacentHTML('beforeend', template);
+            reindexResources();
+        }
+
+        function removeResource(button) {
+            const item = button.closest('.resource-item');
+            item.remove();
+            reindexResources();
+        }
+
+        function reindexResources() {
+            const items = document.querySelectorAll('#resources-container .resource-item');
+
+            items.forEach((item, index) => {
+                const inputs = item.querySelectorAll('input, select');
+
+                inputs.forEach(input => {
+                    if (input.closest('div').querySelector('label').innerText.includes('Кол-во')) {
+                        input.name = `InputDocument.InputResources[${index}].Amount`;
+                    }
+                    else if (input.closest('div').querySelector('label').innerText.includes('Ресурс')) {
+                        input.name = `InputDocument.InputResources[${index}].ResourceId`;
+                    }
+                    else if (input.closest('div').querySelector('label').innerText.includes('Ед. измерения')) {
+                        input.name = `InputDocument.InputResources[${index}].MeasurementUnitId`;
+                    }
+                });
+            });
+
+            resourceIndex = items.length;
+        }
+    </script>
+}

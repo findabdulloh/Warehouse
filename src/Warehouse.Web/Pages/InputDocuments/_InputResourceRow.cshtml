@@ -1,0 +1,33 @@
+﻿@using Warehouse.Service.DTOs.InputResources
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model (int index, InputResourceCreationDto resource, List<SelectListItem> resources, List<SelectListItem> units)
+
+<div class="border p-3 mb-2">
+    <input type="hidden" name="InputDocument.InputResources[@Model.index].ResourceId" value="@Model.resource.ResourceId" />
+    <input type="hidden" name="InputDocument.InputResources[@Model.index].MeasurementUnitId" value="@Model.resource.MeasurementUnitId" />
+
+    <div class="mb-2">
+        <label>Кол-во</label>
+        <input name="InputDocument.InputResources[@Model.index].Amount" class="form-control" value="@Model.resource.Amount" />
+    </div>
+    <div class="mb-2">
+        <label>Ресурс</label>
+        <select name="InputDocument.InputResources[@Model.index].ResourceId" class="form-select">
+            <option value="">-- Выберите ресурс --</option>
+            @foreach (var r in Model.resources)
+            {
+                <option value="@r.Value" selected="@(Model.resource.ResourceId == long.Parse(r.Value))">@r.Text</option>
+            }
+        </select>
+    </div>
+    <div class="mb-2">
+        <label>Ед. измерения</label>
+        <select name="InputDocument.InputResources[@Model.index].MeasurementUnitId" class="form-select">
+            <option value="">-- Выберите ед. измерения --</option>
+            @foreach (var u in Model.units)
+            {
+                <option value="@u.Value" selected="@(Model.resource.MeasurementUnitId == long.Parse(u.Value))">@u.Text</option>
+            }
+        </select>
+    </div>
+</div>

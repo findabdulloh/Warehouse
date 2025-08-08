@@ -1,0 +1,69 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Главная";
+}
+
+<div class="d-flex flex-column justify-content-center align-items-start h-100">
+    <div class="bg-white shadow rounded p-5 w-100">
+        <h2 class="mb-3 text-dark fw-semibold">Добро пожаловать</h2>
+        <p class="text-muted fs-5 mb-4">
+            Выберите раздел, чтобы продолжить работу в системе управления складом.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3">
+            <a href="/InputDocuments/Index" class="btn btn-dark btn-lg shadow-sm">
+                Поступления
+            </a>
+            <a href="/MeasurementUnits/Index" class="btn btn-outline-secondary btn-lg shadow-sm">
+                Единицы измерения
+            </a>
+            <a href="/Resources/Index" class="btn btn-outline-secondary btn-lg shadow-sm">
+                Ресурсы
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        html, body {
+            height: 100%;
+            background-color: #f8f9fa;
+            font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+        }
+
+        main {
+            height: 100%;
+        }
+
+        .btn-outline-teal {
+            color: #0d9488;
+            border-color: #0d9488;
+        }
+
+            .btn-outline-teal:hover {
+                background-color: #0d9488;
+                color: #ffffff;
+            }
+
+        .btn-outline-success {
+            color: #10b981;
+            border-color: #10b981;
+        }
+
+            .btn-outline-success:hover {
+                background-color: #10b981;
+                color: #ffffff;
+            }
+
+        .shadow-sm {
+            transition: all 0.2s ease-in-out;
+        }
+
+            .shadow-sm:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+            }
+    </style>
+}

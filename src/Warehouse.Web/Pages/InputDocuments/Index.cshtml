@@ -1,0 +1,188 @@
+﻿@page
+@model InputDocumentsModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Поступления";
+}
+
+@section Styles {
+    <style>
+        .dropdown-checkboxes {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .dropdown-menu {
+            min-width: 250px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .table td, .table th {
+            vertical-align: middle;
+        }
+
+        .group:hover tr {
+            background-color: #f0f0f0;
+        }
+    </style>
+}
+
+<h2 class="mb-4">Поступления</h2>
+
+<!-- FILTERS -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body border rounded-3">
+        <form method="get" class="row gy-3 gx-4 align-items-end">
+
+            <!-- Date Period -->
+            <div class="col-md-auto">
+                <label class="form-label">Период:</label>
+                <div class="d-flex align-items-center">
+                    <input type="date" asp-for="From" class="form-control me-2" />
+                    <span class="me-2">–</span>
+                    <input type="date" asp-for="To" class="form-control" />
+                </div>
+            </div>
+
+            <!-- Input Document Numbers -->
+            <div class="col-md-auto">
+                <label class="form-label">Номера поступлений:</label>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                        @(Model.InputDocumentIds?.Count > 0
+                            ? $"Выбрано: {Model.AllInputDocuments.Count(d => Model.InputDocumentIds.Contains(d.Id))}"
+                            : "Выбрать")
+                    </button>
+                    <div class="dropdown-menu dropdown-checkboxes">
+                        @foreach (var d in Model.AllInputDocuments)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="InputDocumentIds" value="@d.Id"
+                                @(Model.InputDocumentIds?.Contains(d.Id) == true ? "checked" : "") />
+                                <label class="form-check-label">@d.Number</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources -->
+            <div class="col-md-auto">
+                <label class="form-label">Ресурсы:</label>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                        @(Model.ResourceIds?.Count > 0
+                            ? $"Выбрано: {Model.Resources.Count(r => Model.ResourceIds.Contains(r.Id))}"
+                            : "Выбрать")
+                    </button>
+                    <div class="dropdown-menu dropdown-checkboxes">
+                        @foreach (var r in Model.Resources)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ResourceIds" value="@r.Id"
+                                @(Model.ResourceIds?.Contains(r.Id) == true ? "checked" : "") />
+                                <label class="form-check-label">@r.Name</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Measurement Units -->
+            <div class="col-md-auto">
+                <label class="form-label">Ед. измерения:</label>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                        @(Model.MeasurementUnitIds?.Count > 0
+                            ? $"Выбрано: {Model.MeasurementUnits.Count(mu => Model.MeasurementUnitIds.Contains(mu.Id))}"
+                            : "Выбрать")
+                    </button>
+                    <div class="dropdown-menu dropdown-checkboxes">
+                        @foreach (var mu in Model.MeasurementUnits)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="MeasurementUnitIds" value="@mu.Id"
+                                @(Model.MeasurementUnitIds?.Contains(mu.Id) == true ? "checked" : "") />
+                                <label class="form-check-label">@mu.Name</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="col-md-auto d-flex gap-2 mt-2">
+                <a asp-page="Add" class="btn btn-dark">Добавить</a>
+                <button type="submit" class="btn btn-outline-primary">Применить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- RESULTS TABLE -->
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0 border rounded-3">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Номер</th>
+                    <th>Дата</th>
+                    <th>Ресурс</th>
+                    <th>Ед. изм.</th>
+                    <th>Кол-во</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var doc in Model.InputDocuments)
+                {
+                <tbody class="group" onclick="location.href='@Url.Page("/InputDocuments/Edit", new { id = doc.Id })'" style="cursor:pointer">
+                        @for (int i = 0; i < doc.InputResources.Count; i++)
+                        {
+                            var res = doc.InputResources[i];
+                        <tr>
+                                @if (i == 0)
+                                {
+                                <td rowspan="@doc.InputResources.Count">@doc.Number</td>
+                                <td rowspan="@doc.InputResources.Count">@doc.Date.ToString("yyyy-MM-dd")</td>
+                                }
+                            <td>@res.Resource.Name</td>
+                            <td>@res.MeasurementUnit.Name</td>
+                            <td>@(res.Amount % 1 == 0 ? ((int)res.Amount).ToString() : res.Amount)</td>
+                        </tr>
+                        }
+                </tbody>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdowns = document.querySelectorAll('.dropdown');
+
+            dropdowns.forEach(dropdown => {
+                const button = dropdown.querySelector('button');
+                const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+
+                function updateButtonText() {
+                    const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+                    button.textContent = checkedCount > 0 ? `Выбрано: ${checkedCount}` : "Выбрать";
+                }
+
+                checkboxes.forEach(cb => cb.addEventListener('change', updateButtonText));
+                updateButtonText();
+            });
+        });
+    </script>
+}

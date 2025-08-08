@@ -1,0 +1,144 @@
+﻿@page
+@model EditModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Редактировать поступление";
+}
+
+<h1>Редактировать поступление</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="InputDocument.Id" />
+
+    <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+    <a asp-page-handler="Delete" asp-route-id="@Model.InputDocument.Id" class="btn btn-danger ms-2">Удалить документ</a>
+
+    <div class="mb-3">
+        <label class="form-label">Номер</label>
+        <input asp-for="InputDocument.Number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Дата</label>
+        <input asp-for="InputDocument.Date" type="date" class="form-control" required />
+    </div>
+
+    <h4>Ресурсы</h4>
+    
+    <div id="resources-container">
+        @for (int i = 0; i < Model.InputDocument.InputResources.Count; i++)
+        {
+            <div class="resource-item border p-3 mb-2">
+                <input type="hidden" name="InputDocument.InputResources[@i].Id" value="@Model.InputDocument.InputResources[i].Id" />
+                <div class="mb-2">
+                    <label>Кол-во</label>
+                    <input name="InputDocument.InputResources[@i].Amount" class="form-control" value="@Model.InputDocument.InputResources[i].Amount" required />
+                </div>
+                <div class="mb-2">
+                    <label>Ресурс</label>
+                    <select name="InputDocument.InputResources[@i].ResourceId" class="form-select" required>
+                        <option value="@Model.InputDocumentResult.InputResources[@i].ResourceId" selected>@Model.InputDocumentResult.InputResources[@i].Resource.Name</option>
+                        @foreach (var item in Model.ResourceOptions)
+                        {
+                            @if (item.Value != Model.InputDocument.InputResources[@i].ResourceId.ToString())
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label>Ед. измерения</label>
+                    <select name="InputDocument.InputResources[@i].MeasurementUnitId" class="form-select" required>
+                        <option value="@Model.InputDocumentResult.InputResources[@i].MeasurementUnitId" selected>@Model.InputDocumentResult.InputResources[@i].MeasurementUnit.Name</option>
+                        @foreach (var unit in Model.MeasurementUnitOptions)
+                        {
+                            @if (unit.Value != Model.InputDocument.InputResources[@i].MeasurementUnitId.ToString())
+                            {
+                                <option value="@unit.Value">@unit.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <button type="button" class="btn btn-danger" onclick="removeResource(this)">Удалить</button>
+            </div>
+        }
+    </div>
+
+    <button type="button" class="btn btn-secondary mb-3" onclick="addResource()">Добавить ресурс</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let resourceIndex = @Model.InputDocument.InputResources.Count;
+
+        function addResource() {
+            const container = document.getElementById('resources-container');
+
+            const template = `
+                <div class="resource-item border p-3 mb-2">
+                    <input type="hidden" name="InputDocument.InputResources[${resourceIndex}].Id" value="0" />
+                    <div class="mb-2">
+                        <label>Кол-во</label>
+                        <input name="InputDocument.InputResources[${resourceIndex}].Amount" class="form-control" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>Ресурс</label>
+                        <select name="InputDocument.InputResources[${resourceIndex}].ResourceId" class="form-select" required>
+                            <option value="">-- Выберите ресурс --</option>
+            @foreach (var item in Model.ResourceOptions)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+                </select>
+            </div>
+            <div class="mb-2">
+                <label>Ед. измерения</label>
+                <select name="InputDocument.InputResources[${resourceIndex}].MeasurementUnitId" class="form-select" required>
+                    <option value="">-- Выберите ед. измерения --</option>
+            @foreach (var unit in Model.MeasurementUnitOptions)
+            {
+                                                <option value="@unit.Value">@unit.Text</option>
+            }
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-danger" onclick="removeResource(this)">Удалить</button>
+                        </div>`;
+
+
+            container.insertAdjacentHTML('beforeend', template);
+            reindexResources();
+        }
+
+        function removeResource(button) {
+            const item = button.closest('.resource-item');
+            item.remove();
+            reindexResources();
+        }
+
+        function reindexResources() {
+            const items = document.querySelectorAll('#resources-container .resource-item');
+
+            items.forEach((item, index) => {
+                const inputs = item.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const label = input.closest('div')?.querySelector('label')?.innerText || "";
+
+                    if (input.type === 'hidden') {
+                        input.name = `InputDocument.InputResources[${index}].Id`;
+                    } else if (label.includes('Кол-во')) {
+                        input.name = `InputDocument.InputResources[${index}].Amount`;
+                    } else if (label.includes('Ресурс')) {
+                        input.name = `InputDocument.InputResources[${index}].ResourceId`;
+                    } else if (label.includes('Ед. измерения')) {
+                        input.name = `InputDocument.InputResources[${index}].MeasurementUnitId`;
+                    }
+                });
+            });
+
+            resourceIndex = items.length;
+        }
+    </script>
+}
