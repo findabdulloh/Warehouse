@@ -1,20 +1,14 @@
-Warehouse – Склад
-Сделаны:
+# Warehouse – Склад
+### Сделаны:
+1. Справочники «Ресурсы» и «Единицы измерения»
+2. Раздел «Поступления»
 
-Справочники «Ресурсы» и «Единицы измерения»
+### Используемые технологии
+1. ASP.NET Core 8
+2. Razor Pages
+3. Entity Framework Core
+4. PostgreSQL
 
-Раздел «Поступления»
-
-Используемые технологии
-ASP.NET Core 8
-
-Razor Pages
-
-Entity Framework Core
-
-PostgreSQL
-
-Порты
+### Порты
 API → https://localhost:7163
-
 Razor (Web) → https://localhost:7251
